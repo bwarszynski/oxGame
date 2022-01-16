@@ -11,6 +11,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import lab.oxgame.dao.RozgrywkaDAO;
 import lab.oxgame.dao.RozgrywkaDAOImpl;
+import lab.oxgame.engine.OXGame;
+import lab.oxgame.engine.OXGameImpl;
 import lab.oxgame.model.OXEnum;
 import lab.oxgame.model.Rozgrywka;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ public class MainController {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     private RozgrywkaDAO rozgrywkaDAO;
     private ExecutorService executor;
+    private OXGame oxgame;
 
     @FXML
     private TableView<Rozgrywka> rozgrywkaTable;
@@ -45,6 +48,8 @@ public class MainController {
 
     public MainController(){
         rozgrywkaDAO = new RozgrywkaDAOImpl();
+        executor.Executors.newSingleThreadExecutor();
+        oxGame = new OXGameImpl();
     }
 
     @FXML
@@ -111,6 +116,25 @@ public class MainController {
             //rozgrywkaDAO.deleteAll();
         } catch (Exception e) {
             logger.error("Błąd podczas testowania operacji bazodanowych!", e);
+        }
+    }
+
+    @FXML
+    public void onActionBtn1(ActionEvent event){
+        ruch((Button)event.getSource(),1);
+    }
+
+    private void ruch(Button btn, int index) {
+        OXEnum kolej = oxGame.getKolej();
+        if (!OXEnum.BRAK.equals(oxGame.getKolej())){
+            if (OXEnum.BRAK.equals(oxGame.getPole())){
+                btn.setText(kolej.toString());
+                oxGame.setPole(index);
+                kolej = oxGame.getKolej();
+                //TODO
+                // Jeśli koniec rozgrywki - zapisanie do bazy i aktualizacja listy history
+                // lub tylko aktualizacja komunikatu, np. Ruch gracza X
+            }
         }
     }
 }
